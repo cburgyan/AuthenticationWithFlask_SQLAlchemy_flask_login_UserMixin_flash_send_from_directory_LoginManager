@@ -16,9 +16,13 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(100))
+    salt = db.Column(db.String(100))
+    hash_method = db.Column(db.String(100))
     name = db.Column(db.String(1000))
+
+
 # Line below only required once, when creating DB.
-# db.create_all()
+db.create_all()
 
 
 @app.route('/')
@@ -32,8 +36,11 @@ def register():
         name = request.form.get('name')
         email = request.form.get('email')
         password = request.form.get('password')
+        generated_hash = generate_password_hash(password, method='pbkdf2:sha256', salt_length=8)
+        print(generated_hash)
+        generated_hash_list = generated_hash.split('$')
 
-        new_user = User(name=name, email=email, password=password)
+        new_user = User(name=name, email=email, password=generated_hash_list[2], salt=generated_hash_list[1], hash_method=generated_hash_list[0])
         db.session.add(new_user)
         db.session.commit()
 
