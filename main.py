@@ -52,7 +52,12 @@ def register():
     if request.method == 'POST':
         name = request.form.get('name')
         email = request.form.get('email')
+        if User.query.filter_by(email=email).first():
+            flash("You've already signed up with that email, log in instead!")
+            return redirect(url_for('login'))
         password = request.form.get('password')
+
+
         generated_hash = generate_password_hash(password, method='pbkdf2:sha256', salt_length=8)
         print(generated_hash)
 
@@ -90,9 +95,10 @@ def login():
                 print('Logged in successfully.')
                 return redirect(url_for('secrets', name=user.name))
             else:
+                flash('Password incorrect. Please try again.')
                 print('Login failed. Password failed.')
         else:
-            flash('Login failed.')
+            flash('That email does not exist. Please try again.')
             print('Login failed. Failed to find user in database.')
             time.sleep(2)
     return render_template("login.html")
