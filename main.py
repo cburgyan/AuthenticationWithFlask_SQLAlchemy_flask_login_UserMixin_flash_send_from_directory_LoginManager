@@ -44,7 +44,7 @@ db.create_all()
 
 @app.route('/')
 def home():
-    return render_template("index.html")
+    return render_template("index.html", current_user=current_user)
 
 
 @app.route('/register', methods=['POST', 'GET'])
@@ -91,7 +91,7 @@ def login():
             if check_password_hash(user.password, password):
                 login_user(user)
                 db.session.commit()
-                flash('Logged in successfully.')
+                # flash('Logged in successfully.')
                 print('Logged in successfully.')
                 return redirect(url_for('secrets', name=user.name))
             else:
